@@ -1,0 +1,7 @@
+gradio>4
+transformers
+bitsandbytes
+sentencepiece
+einops
+accelerate
+tiktoken
