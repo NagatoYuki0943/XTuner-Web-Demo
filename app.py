@@ -8,8 +8,10 @@ import gradio as gr
 
 print("torch version: ", torch.__version__)
 print("transformers version: ", transformers.__version__)
+print("gradio version: ", gr.__version__)
 
 
+# clone 模型
 model_path = './models/internlm2-chat-1_8b-self'
 os.system(f'git clone https://code.openxlab.org.cn/NagatoYuki0943/xtuner-self-assistant.git {model_path}')
 os.system(f'cd {model_path} && git lfs pull')
@@ -44,10 +46,7 @@ model.eval()
 
 print(f"model.device: {model.device}, model.dtype: {model.dtype}")
 
-system_prompt = """You are an AI assistant whose name is InternLM (书生·浦语).
-- InternLM (书生·浦语) is a conversational language model that is developed by Shanghai AI Laboratory (上海人工智能实验室). It is designed to be helpful, honest, and harmless.
-- InternLM (书生·浦语) can understand and communicate fluently in the language chosen by the user such as English and 中文.
-"""
+system_prompt = """你是NagatoYuki0943的小助手，内在是上海AI实验室书生·浦语的 InternLM2 1.8B 大模型哦"""
 print("system_prompt: ", system_prompt)
 
 
@@ -58,18 +57,19 @@ def chat(
     top_p: float = 0.8,
     temperature: float = 0.8,
     regenerate: bool = False
-) -> tuple[str, list]:
+) -> list:
+    history = [] if history is None else history
     # 重新生成时要把最后的query和response弹出,重用query
     if regenerate:
         # 有历史就重新生成,没有历史就返回空
         if len(history) > 0:
             query, _ = history.pop(-1)
         else:
-            return "", history
+            return history
     else:
         query = query.replace(' ', '')
         if query == None or len(query) < 1:
-            return "", history
+            return history
 
     print({"max_new_tokens":  max_new_tokens, "top_p": top_p, "temperature": temperature})
 
@@ -88,7 +88,7 @@ def chat(
     )
     print("chat: ", query, response)
 
-    return "", history
+    return history
 
 
 def regenerate(
@@ -96,14 +96,14 @@ def regenerate(
     max_new_tokens: int = 1024,
     top_p: float = 0.8,
     temperature: float = 0.8,
-) -> tuple[str, list]:
+) -> list:
     """重新生成最后一次对话的内容"""
-    # 只返回history
-    return chat("", history, max_new_tokens, top_p, temperature, regenerate=True)[1]
+    return chat("", history, max_new_tokens, top_p, temperature, regenerate=True)
 
 
-def revocery(history: list):
+def revocery(history: list) -> list:
     """恢复到上一轮对话"""
+    history = [] if history is None else history
     if len(history) > 0:
         history.pop(-1)
     return history
@@ -165,14 +165,28 @@ with block as demo:
         query.submit(
             chat,
             inputs=[query, chatbot, max_new_tokens, top_p, temperature],
-            outputs=[query, chatbot]
+            outputs=[chatbot]
+        )
+
+        # 清空query
+        query.submit(
+            lambda: gr.Textbox(value=""),
+            [],
+            [query],
         )
 
         # 按钮提交
         submit.click(
             chat,
             inputs=[query, chatbot, max_new_tokens, top_p, temperature],
-            outputs=[query, chatbot]
+            outputs=[chatbot]
+        )
+
+        # 清空query
+        submit.click(
+            lambda: gr.Textbox(value=""),
+            [],
+            [query],
         )
 
         # 重新生成
@@ -190,7 +204,8 @@ with block as demo:
         )
 
     gr.Markdown("""提醒：<br>
-    1. 使用中如果出现异常，将会在文本输入框进行展示，请不要惊慌。 <br>
+    1. 使用中如果出现异常，将会在文本输入框进行展示，请不要惊慌。<br>
+    2. 项目地址: https://github.com/NagatoYuki0943/XTuner-Web-Demo<br>
     """)
 
 # threads to consume the request
@@ -199,8 +214,10 @@ gr.close_all()
 # 设置队列启动，队列最大长度为 100
 demo.queue(max_size=100)
 
-# 启动新的 Gradio 应用，设置分享功能为 True，并使用环境变量 PORT1 指定服务器端口。
-# demo.launch(share=True, server_port=int(os.environ['PORT1']))
-# 直接启动
-# demo.launch(server_name="127.0.0.1", server_port=7860)
-demo.launch()
+
+if __name__ == "__main__":
+    # 启动新的 Gradio 应用，设置分享功能为 True，并使用环境变量 PORT1 指定服务器端口。
+    # demo.launch(share=True, server_port=int(os.environ['PORT1']))
+    # 直接启动
+    # demo.launch(server_name="127.0.0.1", server_port=7860)
+    demo.launch()
