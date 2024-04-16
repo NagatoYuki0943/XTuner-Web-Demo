@@ -1,5 +1,6 @@
 gradio>4
 transformers
+peft
 bitsandbytes
 sentencepiece
 einops
