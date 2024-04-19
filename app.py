@@ -220,6 +220,7 @@ def main():
 
         gr.Markdown("""提醒：<br>
         1. 使用中如果出现异常，将会在文本输入框进行展示，请不要惊慌。<br>
+        2. 项目地址：https://github.com/NagatoYuki0943/XTuner-Web-Demo
         """)
 
     # threads to consume the request
