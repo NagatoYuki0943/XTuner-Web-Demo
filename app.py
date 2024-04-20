@@ -108,12 +108,13 @@ def chat(
     print("\n")
 
 
-def revocery(history: list) -> list:
+def revocery(history: list) -> tuple[str, list]:
     """恢复到上一轮对话"""
     history = [] if history is None else history
+    query = ""
     if len(history) > 0:
-        history.pop(-1)
-    return history
+        query, _ = history.pop(-1)
+    return query, history
 
 
 def main():
@@ -215,7 +216,7 @@ def main():
             undo.click(
                 revocery,
                 inputs=[chatbot],
-                outputs=[chatbot]
+                outputs=[query, chatbot]
             )
 
         gr.Markdown("""提醒：<br>
