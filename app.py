@@ -8,20 +8,18 @@ print("gradio version: ", gr.__version__)
 
 
 # clone 模型
-pretrained_model_name_or_path = './models/internlm2-chat-1_8b-self'
-os.system(f'git clone https://code.openxlab.org.cn/NagatoYuki0943/xtuner-self-assistant.git {pretrained_model_name_or_path}')
-os.system(f'cd {pretrained_model_name_or_path} && git lfs pull')
-adapter_dir = None
-
+PRETRAINED_MODEL_NAME_OR_PATH = './models/internlm2-chat-1_8b-self'
+os.system(f'git clone https://code.openxlab.org.cn/NagatoYuki0943/xtuner-self-assistant.git {PRETRAINED_MODEL_NAME_OR_PATH}')
+os.system(f'cd {PRETRAINED_MODEL_NAME_OR_PATH} && git lfs pull')
+ADAPTER_DIR = None
 # 量化
-load_in_8bit = False
-load_in_4bit = False
+LOAD_IN_8BIT = False
+LOAD_IN_4BIT = False
+tokenizer, model = load_model(PRETRAINED_MODEL_NAME_OR_PATH, ADAPTER_DIR, LOAD_IN_8BIT, LOAD_IN_4BIT)
 
-tokenizer, model = load_model(pretrained_model_name_or_path, adapter_dir, load_in_8bit, load_in_4bit)
 
-
-system_prompt = """你是NagatoYuki0943的小助手，内在是上海AI实验室书生·浦语的 InternLM2 1.8B 大模型哦"""
-print("system_prompt: ", system_prompt)
+SYSTEM_PROMPT = """你是NagatoYuki0943的小助手，内在是上海AI实验室书生·浦语的 InternLM2 1.8B 大模型哦"""
+print("system_prompt: ", SYSTEM_PROMPT)
 
 
 def chat(
@@ -42,7 +40,7 @@ def chat(
             yield history
             return # 这样写管用,但不理解
     else:
-        query = query.replace(' ', '')
+        query = query.strip()
         if query == None or len(query) < 1:
             yield history
             return
@@ -62,7 +60,7 @@ def chat(
             temperature = temperature,
             top_p = top_p,
             top_k = top_k,
-            meta_instruction = system_prompt,
+            meta_instruction = SYSTEM_PROMPT,
         ):
         if response is not None:
             print(response[length:], flush=True, end="")
