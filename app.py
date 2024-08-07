@@ -11,7 +11,7 @@ logger.info(f"gradio version: {gr.__version__}")
 
 # clone 模型
 MODEL_PATH = './models/internlm2_5-1_8b-chat-self-assistant'
-os.system(f'git clone https://code.openxlab.org.cn/NagatoYuki0943/internlm2_5-1_8b-chat-self-assistant.git {PRETRAINED_MODEL_NAME_OR_PATH}')
+os.system(f'git clone https://code.openxlab.org.cn/NagatoYuki0943/internlm2_5-1_8b-chat-self-assistant.git {MODEL_PATH}')
 os.system(f'cd {MODEL_PATH} && git lfs pull')
 
 SYSTEM_PROMPT = """"""
