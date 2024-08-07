@@ -1,8 +1,11 @@
 gradio>4
+huggingface-hub
+modelscope
+accelerate
 transformers
-peft
+einops
 bitsandbytes
 sentencepiece
-einops
-accelerate
 tiktoken
+lmdeploy>=0.5.2
+loguru
