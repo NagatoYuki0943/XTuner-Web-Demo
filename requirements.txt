@@ -1,4 +1,4 @@
-gradio>4
+gradio>5
 huggingface-hub
 modelscope
 accelerate
@@ -7,5 +7,5 @@ einops
 bitsandbytes
 sentencepiece
 tiktoken
-lmdeploy>=0.5.3
+lmdeploy>=0.6.2
 loguru
